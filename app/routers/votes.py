@@ -1,6 +1,5 @@
-from .. import schemas, models, utils, oauth2
+from .. import schemas, models, oauth2
 from ..database import get_db
-from sqlalchemy.exc import IntegrityError
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 
@@ -20,9 +19,9 @@ async def vote(
             detail="Post not found",
         )
 
-    vote_query = db.query(models.Votes).filter(
-        models.Votes.post_id == vote.post_id,
-        models.Votes.user_id == current_user.id,
+    vote_query = db.query(models.Vote).filter(
+        models.Vote.post_id == vote.post_id,
+        models.Vote.user_id == current_user.id,
     )
     found_vote = vote_query.first()
     
@@ -39,7 +38,7 @@ async def vote(
                 detail="You already voted this post",
             )
         
-        new_vote = models.Votes(post_id= vote.post_id, user_id = current_user.id)
+        new_vote = models.Vote(post_id= vote.post_id, user_id = current_user.id)
         db.add(new_vote)
         db.commit()
         return {"message": "successfully voted"}
